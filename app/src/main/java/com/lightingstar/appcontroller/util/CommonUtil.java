@@ -2,14 +2,20 @@ package com.lightingstar.appcontroller.util;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.lightingstar.appcontroller.MyApp;
 import com.lightingstar.appcontroller.Task.MyAsyncTaskTemplate;
 import com.lightingstar.appcontroller.model.AppConstance;
 import com.lightingstar.appcontroller.model.AppRuningInfo;
+import com.lightingstar.appcontroller.server.WindowMonitorService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommonUtil {
@@ -51,5 +57,14 @@ public class CommonUtil {
         }
 
         return findBackendTaskFlag;
+    }
+
+    public static void sendBroadcast(ArrayList<String> data){
+        Intent intent = new Intent(AppConstance.ACTION_COMMUNITY);
+        intent.setComponent(new ComponentName(AppConstance.APP_PACKAGE_NAME,
+                WindowMonitorService.ServiceBroadcastReceiver.class.getName()));
+        intent.putExtra("data",data);
+
+        LocalBroadcastManager.getInstance(MyApp.getMyApplicationContext()).sendBroadcast(intent);
     }
 }

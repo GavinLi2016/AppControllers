@@ -148,6 +148,7 @@ public class MainActivity extends BaseActivity implements OnTaskListener {
             }
             case SAVE_CONFIG:{
                 FileOperationUtil.saveFile(ForbiddentAppInfoUtil.getForbiddentPackages());
+                CommonUtil.sendBroadcast(ForbiddentAppInfoUtil.getForbiddentPackages());
                 break;
             }
             case EXIST_APP:{

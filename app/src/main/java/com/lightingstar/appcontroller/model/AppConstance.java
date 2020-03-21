@@ -7,4 +7,5 @@ public class AppConstance {
 
     public static final String ACTION_BOOT = "android.intent.action.BOOT_COMPLETED";
     public static final String ACTION_RESTART = "com.lightingstar.appcontroller.restart";
+    public static final String ACTION_COMMUNITY = "com.lightingstar.appcontroller.community";
 }

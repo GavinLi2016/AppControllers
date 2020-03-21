@@ -1,11 +1,11 @@
 package com.lightingstar.appcontroller.util;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 
 public class ForbiddentAppInfoUtil {
-    private static HashSet<String> forbiddentPackages = new HashSet<>();
+    private static ArrayList<String> forbiddentPackages = new ArrayList<>();
 
-    public static HashSet<String> getForbiddentPackages(){
+    public static ArrayList<String> getForbiddentPackages(){
         return forbiddentPackages;
     }
 
@@ -21,7 +21,7 @@ public class ForbiddentAppInfoUtil {
      * 初始化需要禁止运行的app-查本地数据库
      */
     public static void initForbiddentPackages(){
-        HashSet<String> data =  FileOperationUtil.readFile();
+        ArrayList<String> data =  FileOperationUtil.readFile();
         if (data != null) {
             forbiddentPackages = data;
         }

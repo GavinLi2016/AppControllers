@@ -1,14 +1,15 @@
 package com.lightingstar.appcontroller.util;
 
+import com.xuexiang.xutil.common.StringUtils;
 import com.xuexiang.xutil.file.FileIOUtils;
 import com.xuexiang.xutil.file.FileUtils;
 
 import java.io.File;
-import java.util.HashSet;
+import java.util.ArrayList;
 
 public class FileOperationUtil {
     private static final  String FILE_NAME = "appcontroller.txt";
-    public static void saveFile(HashSet<String> data){
+    public static void saveFile(ArrayList<String> data){
         if (data == null || data.size() == 0 ) return;
 
         StringBuilder content = new StringBuilder();
@@ -22,17 +23,17 @@ public class FileOperationUtil {
         }
     }
 
-    public static HashSet<String> readFile(){
+    public static ArrayList<String> readFile(){
         String content="";
         String filePath = FileUtils.getDiskDir()+File.separator + FILE_NAME;
         if (FileUtils.isFileExists(filePath)){
             content = FileIOUtils.readFile2String(filePath);
         }
 
-        if (content == "") return null;
+        if (StringUtils.isEmpty(content)) return new ArrayList<>();
 
         String[] splitContent = content.split(";");
-        HashSet<String> appInfo = new HashSet<>();
+        ArrayList<String> appInfo = new ArrayList<>();
 
         for (String s:splitContent){
             appInfo.add(s);

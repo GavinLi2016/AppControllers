@@ -2,19 +2,34 @@ package com.lightingstar.appcontroller.server;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 
-import com.lightingstar.appcontroller.activity.MainActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import com.lightingstar.appcontroller.R;
 import com.lightingstar.appcontroller.model.AppConstance;
 import com.lightingstar.appcontroller.util.CommonUtil;
-import com.lightingstar.appcontroller.util.DialogUtil;
-import com.lightingstar.appcontroller.util.ForbiddentAppInfoUtil;
 import com.lightingstar.appcontroller.util.LogUtil;
 
+import java.util.ArrayList;
+
 public class WindowMonitorService extends AccessibilityService {
+
+    private AlertDialog dialog;
+    private  boolean isShow = false;
+
+    private ArrayList<String> forbiddentAppList = new ArrayList<>();
+
+    ServiceBroadcastReceiver broadcastReceiver = new ServiceBroadcastReceiver();
 
     @Override
     protected void onServiceConnected() {
@@ -31,15 +46,12 @@ public class WindowMonitorService extends AccessibilityService {
             }
 
             setServiceInfo(config);
-
-            //PermissionMonitorUtil.setAccessibilityPassFlag(true);
-
-            boolean flag = CommonUtil.moveToFront();
-            if (!flag) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                this.startActivity(intent);
-            }
+            //初始化浮动窗口
+            dialog = prepareDialog();
+            //注册广播器
+            IntentFilter filter = new IntentFilter(AppConstance.ACTION_COMMUNITY);
+            filter.addAction(AppConstance.ACTION_COMMUNITY);
+            LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver, filter);
         }
         catch (Exception e){
             LogUtil.info(null,e.getMessage());
@@ -54,7 +66,7 @@ public class WindowMonitorService extends AccessibilityService {
                 if (packageName == null) {
                     return;
                 }
-                if (DialogUtil.isShow()) {
+                if (isShow) {
                     return;
                 }
                 //LogUtil.info("change pakcage:",packageName);
@@ -84,15 +96,13 @@ public class WindowMonitorService extends AccessibilityService {
             try {
                 String packageName = params[0];
                 //判断是否要禁止运行该App
-                if (!ForbiddentAppInfoUtil.getForbiddentPackages().contains(packageName)) {
+                if (!forbiddentAppList.contains(packageName)) {
                     CommonUtil.recordAppRunningInfo(packageName);
                     return false;
                 }
                 CommonUtil.recordAppRunningInfo(packageName);
 
                 LogUtil.info("send msg:", packageName);
-
-                //MessageUtil.sendMessage(packageName, AppConstance.WIN_CHANGE_MSG);
                 return true;
             }
             catch (Exception e){
@@ -106,7 +116,8 @@ public class WindowMonitorService extends AccessibilityService {
         protected void onPostExecute(Boolean result) {
             try {
                 if (result) {
-                    DialogUtil.showAlertDialog("");
+                    isShow =true;
+                    dialog.show();
                 }
             }
             catch (Exception e){
@@ -117,4 +128,31 @@ public class WindowMonitorService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {}
+
+
+    private AlertDialog prepareDialog(){
+        AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
+                .setMessage(R.string.content_warning)
+                .setCancelable(false)
+                .setPositiveButton(R.string.lab_ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        isShow = false;
+                        dialog.dismiss();
+                    }
+                }).create();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
+        }else {
+            dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        }
+
+        return dialog;
+    }
+
+    public class ServiceBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            forbiddentAppList = intent.getStringArrayListExtra("data");
+        }
+    }
 }

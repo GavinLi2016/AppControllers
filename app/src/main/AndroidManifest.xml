@@ -38,8 +38,6 @@
             android:name=".util.update.UpdateTipDialog"
             android:screenOrientation="portrait"
             android:theme="@style/DialogTheme" />
-
-      <!--  <service android:name=".server.MonitorServer" android:stopWithTask="false"></service>-->
         <service
             android:name=".server.WindowMonitorService"
             android:label="学生监控服务"
@@ -48,13 +46,13 @@
                 <action android:name="android.accessibilityservice.AccessibilityService"/>
             </intent-filter>
         </service>
-        <receiver android:name=".server.BootBroadcastReceiver" >
+        <!--<receiver android:name=".server.BootBroadcastReceiver" >
             <intent-filter >
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.lightingstar.appcontroller.destroy" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
 
         <!--屏幕自适应设计图-->
         <meta-data
